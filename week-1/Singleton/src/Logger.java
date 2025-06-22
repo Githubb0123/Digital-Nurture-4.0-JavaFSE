@@ -4,17 +4,14 @@ import java.util.Date;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Logger {
-    // Singleton instance
     private static Logger instance;
     private static final ReentrantLock lock = new ReentrantLock();
     
-    // Configuration
     private LogLevel logLevel = LogLevel.INFO;
     private PrintWriter fileWriter;
     private final SimpleDateFormat dateFormat = 
         new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
     
-    // Private constructor
     private Logger() {
         setupFileWriter();
         Runtime.getRuntime().addShutdownHook(new Thread(this::cleanup));
@@ -33,7 +30,6 @@ public class Logger {
         }
     }
     
-    // Thread-safe singleton access
     public static Logger getInstance() {
         if (instance == null) {
             lock.lock();
@@ -48,12 +44,10 @@ public class Logger {
         return instance;
     }
     
-    // Set log level
     public void setLogLevel(LogLevel level) {
         this.logLevel = level;
     }
     
-    // Core logging method
     public void log(LogLevel level, String message) {
         if (!logLevel.shouldLog(level)) return;
         
@@ -62,17 +56,14 @@ public class Logger {
         String logEntry = String.format("[%s] [%s] [%s] %s",
             timestamp, threadName, level, message);
         
-        // Console output
         System.out.println(logEntry);
         
-        // File output
         if (fileWriter != null) {
             fileWriter.println(logEntry);
             fileWriter.flush();
         }
     }
     
-    // Convenience methods
     public void debug(String message) {
         log(LogLevel.DEBUG, message);
     }
@@ -93,14 +84,12 @@ public class Logger {
         log(LogLevel.CRITICAL, message);
     }
     
-    // Cleanup resources
     private void cleanup() {
         if (fileWriter != null) {
             fileWriter.close();
         }
     }
     
-    // For testing purposes
     void setFileWriter(PrintWriter writer) {
         this.fileWriter = writer;
     }
